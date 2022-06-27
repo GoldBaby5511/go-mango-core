@@ -1,0 +1,193 @@
+syntax = "proto2";
+package bs.types;
+option go_package ="api/types";
+//option go_package ="/types";
+
+message ErrorInfo{
+	optional int32	code = 1;
+	optional string info = 2;
+}
+
+//财富+道具类型,小于等于1000预留、普通道具从1001开始
+enum PropType{
+	Ankt = 1;
+	Lvs = 2;
+	Score = 3;
+	Gold = 4;
+	MaxWealthId = 1000;
+	AvisStone=1001;
+	CloudStone=1002;
+	ArosStone=1003;
+	CycloniusStone=1004;
+	FluvisStone=1005;
+	SalisStone=1006;
+	HayleStone=1007;
+	NeptulusStone=1008;
+	SigmeStone=1009;
+	AsheStone=1010;
+	PyreStone=1011;
+	FernisStone=1012;
+	TeraStone=1013;
+	ClayeStone=1014;
+	LiosStone=1015;
+	GeodStone=1016;
+	WrathSpirit =2001;
+	PatienceSpirit =2002;
+	ReticenceSpirit =2003;
+	PietySpirit =2004;
+	SlothSpirit =2005;
+	EnvySpirit =2006;
+	PacifismSpirit =2007;
+	FaithSpirit =2008;
+	GluttonySpirit =2009;
+	PrideSpirit =2010;
+	TruthSpirit =2011;
+	ReposeSpirit =2012;
+	LustSpirit =2013;
+	FearSpirit =2014;
+	PuritySpirit =2015;
+	SelflessnessSpirit =2016;
+	Energy = 3001;
+}
+
+enum ActionType {
+	Add=1; //增
+	Delete=2; //删
+	Update=3; //改
+	Get=4; //查
+	Up=5; //上
+	Down=6; //下
+	Forward=7; //向前
+	Backward=8; //向后
+}
+
+enum ActionErrCode {
+	Success = 0;	//操作成功
+	IllegalUser = 1;	//非法访问
+	ParamError = 2;	//参数异常
+	ServerError = 3;	//服务异常
+	UpperLimit = 4;	//已达上限
+	LowerLimit = 5;	//没有更多了
+	HasExist = 6;	//目标已存在
+	NotExist = 7;	//目标不存在
+	HasUsed = 8;	//已使用
+	NotUsed = 9;	//未使用
+	TooFrequently = 10; //操作过于频繁
+	ChargeTypeError = 11; //charge类型不匹配
+	NoNeedUpdate = 12; //没有修改
+	HasFinished = 13; //已完成
+	NotFinished = 14 ; //未完成
+}
+
+message PropItem{
+	optional PropType	prop_id = 1;				//道具从1001开始，1=ankt、2=lvs、3=score、4=gold
+	optional int64		prop_count = 2;
+	optional uint64 	season_id = 3;			//赛季Id
+}
+
+message BaseAppInfo{
+	optional string			name = 1;
+	optional uint32			type = 2;
+	optional uint32			id = 3;
+	optional uint32			version = 4;
+}
+
+message BaseUserInfo {
+	enum UserType{
+		Normal = 0;	//正常类型
+		Robot = 10;	//机器人
+	}
+	optional string		account = 1;			//用户账号
+	optional uint64   	user_id = 2;         	//用户ID 
+	optional uint64   	game_id = 3;			//数字ID
+	optional uint32		gender = 4;				//性别
+	optional uint32		face_id = 5;			//头像id
+	optional string		custom_face = 6;		//自定义的图像地址
+	optional string		nick_name = 7;			//昵称
+	optional UserType 	user_type = 8;			//用户类别
+	repeated PropItem 	user_props = 9;			//用户道具
+	optional uint32		market_id = 10;			//登录主渠道
+	optional uint32		site_id = 11;         	//登录子渠道
+	optional uint32		reg_market_id = 12;		//注册主渠道
+	optional uint32		reg_site_id = 13;		//注册子渠道
+	optional string		register_data = 14;   	//注册时间
+	optional uint64 	gate_connid = 15; 		//关联的gate连接id
+	optional uint32		logic_app_id = 16;		//关联logic
+}
+
+message LogicInfo{
+	optional BaseAppInfo			app_info = 1;
+	optional int32   					state = 2;         	//状态
+}
+
+//身体部件
+message PetBody{
+	optional uint32					base_att = 1;
+	optional uint32					level = 2;
+}
+
+//宠物性格
+message PetCharacter{
+	optional uint32					base_att = 1;
+	optional string					name = 2;
+}
+
+//增减益
+message BuffInfo{
+	optional uint32 		buff_id = 1; //ID
+	optional uint32 		type = 2; //加成类型
+	optional uint32 		value = 3; //加成值
+	optional uint32 		value_scale = 4; //加成值缩放比
+	optional uint32 		ConditionType = 5; //使用条件类型
+	optional uint32 		ConditionValue = 6; //使用条件值
+}
+
+//装备
+message EquipInfo{
+	optional uint64			equip_id = 1; //唯一ID
+	optional uint32 		charge = 2;	//2金币 3chain
+	optional uint64			pet_id = 3; //被装备的宿主宠物ID 为空或为0表示未装备
+	optional uint32			base_att = 4; //属性
+	optional uint32			quality = 5; //品质等级
+	repeated BuffInfo  	buffs = 6; //加成
+	optional uint32 		pos = 7; //放置在对应装备栏的位置 从0开始 仅在被装备在宠物身上时生效
+}
+
+message PetInfo{
+	optional uint64   		pet_id = 1;         	//ID
+	optional uint32 			charge = 2;						//2金币 3chain
+	optional uint32				base_att = 3;					//1风 2水 3火 4土
+	optional uint32  			base_type = 4;				//1物理 2魔法
+	optional uint32				level = 5;						//等级
+	optional PetBody			horn = 6;							//角
+	optional PetBody			eye  = 7;							//眼睛
+	optional PetBody			wing = 8;							//翅膀
+	optional PetBody			tail = 9;							//尾巴
+	optional PetCharacter	character = 10;				//性格
+	optional uint64 			blood_count = 11;   					// 生命值
+	optional uint64 			physical_attack = 12;  				// 物理攻击力
+	optional uint64 			magic_attack = 13;  					// 魔法攻击力
+	optional uint64 			physical_defense = 14; 				// 物理防御力
+	optional uint64 			magic_defense = 15;   				// 魔法防御力
+	optional uint64 			attack_speed = 16; 						// 攻击速度
+	optional int32 				wind_defense_percent = 17; 	  // 风抗万分比提高
+	optional int32 				water_defense_percent = 18;   // 水抗万分比提高
+	optional int32 				fire_defense_percent = 19;    // 火抗万分比提高
+	optional int32 				dust_defense_percent = 20;    // 土抗万分比提高
+	repeated EquipInfo		equips = 21;									// 装备列表
+	optional int32  			state = 22;										// 宠物状态 0空闲 1战斗 2探险
+}
+
+message PetPoint{
+	optional uint64		pet_id = 1;
+	optional int32		x  = 2;
+	optional int32		y = 3;
+}
+
+message PetTeam{
+	optional uint32 id = 1;
+	optional string name = 2;
+	optional int64 create_time = 3;
+	optional int64 last_change_time = 4;
+	repeated PetPoint pet_points = 5;
+}
