@@ -1,7 +1,7 @@
 package apollo
 
 import (
-	"api/config"
+	"github.com/GoldBaby5511/go-mango-core/api/config"
 	"github.com/GoldBaby5511/go-mango-core/conf"
 	"github.com/GoldBaby5511/go-mango-core/log"
 	n "github.com/GoldBaby5511/go-mango-core/network"
