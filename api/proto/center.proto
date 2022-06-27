@@ -1,5 +1,4 @@
 syntax = "proto2";
-import "types.proto";
 package bs.center;
 option go_package ="/center";
 
@@ -68,9 +67,11 @@ enum CtlId{
 }
 
 message controlItem{
-	optional types.BaseAppInfo			base_Info=1;					//操作服务
-	optional string 								command=2;							//命令
-	repeated string 								args=3;									//参数
+	optional string			name = 1;
+	optional uint32			type = 2;
+	optional uint32			id = 3;
+	optional string 								command=4;							//命令
+	repeated string 								args=5;									//参数
 }
 
 message AppControlReq {
@@ -85,7 +86,8 @@ message AppControlRsp {
 	optional int32 									ctl_id = 1; 						// 命令编号
 	optional uint32 								app_type=2;
 	optional uint32 								app_id =3;
-	optional types.ErrorInfo				err_info = 99;
+	optional int32	code = 4;
+	optional string info = 5;
 }
 
 service AppControl{
