@@ -21,9 +21,9 @@ message ConfigReq {
 	optional string key				= 2;		// 键名 空表示命名空间下的所有键
 	optional uint32 subscribe		= 3;		// 是否订阅配置的更新 见EnumSubscribe
 	optional uint32 app_type		= 4;		// AppType
-	optional uint32 app_id			= 5;		// AppID
+	optional uint32 app_id			= 5;		// AppId
 	optional uint32 sub_app_type	= 6;		// AppType
-	optional uint32 sub_app_id		= 7;		// AppID
+	optional uint32 sub_app_id		= 7;		// AppId
 }
 
 //配置条目
@@ -38,7 +38,7 @@ message ConfigRsp {
 	optional string 		reg_key				= 2;		// 订阅的key
 	repeated ConfigItem item					= 3;		// 键值
 	optional uint32 		sub_app_type	= 4;		// AppType
-	optional uint32 		sub_app_id		= 5;		// AppID
+	optional uint32 		sub_app_id		= 5;		// AppId
 }
 
 //配置响应完成

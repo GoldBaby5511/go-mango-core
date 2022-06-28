@@ -34,13 +34,13 @@ func (a *agentClient) Run() {
 			if bm.Cmd.CmdId == uint16(center.CMDCenter_IDAppRegReq) {
 				var m center.RegisterAppReq
 				_ = proto.Unmarshal(msgData, &m)
-				a.info = n.BaseAgentInfo{AgentType: n.CommonServer, AppName: m.GetAppName(), AppType: m.GetAppType(), AppID: m.GetAppId()}
+				a.info = n.BaseAgentInfo{AgentType: n.CommonServer, AppName: m.GetAppName(), AppType: m.GetAppType(), AppId: m.GetAppId()}
 				if agentChanRPC != nil {
 					agentChanRPC.Call0(CommonServerReg, a, a.info)
 				}
 				log.Debug("", "相互注册,%v", a.info)
 				mxClients.Lock()
-				clients[util.MakeUint64FromUint32(a.info.AppType, a.info.AppID)] = a
+				clients[util.MakeUint64FromUint32(a.info.AppType, a.info.AppId)] = a
 				mxClients.Unlock()
 				continue
 			} else if bm.Cmd.CmdId == uint16(center.CMDCenter_IDHeartBeatReq) {
@@ -57,7 +57,7 @@ func (a *agentClient) Run() {
 			unmarshalCmd = n.TCPCommand{AppType: uint16(m.GetDataApptype()), CmdId: uint16(m.GetDataCmdid())}
 			msgData = m.GetData()
 			dataReq = &m
-			bm.AgentInfo = n.BaseAgentInfo{AgentType: n.NormalUser, AppName: "NormalUser", AppType: util.GetHUint32FromUint64(m.GetGateconnid()), AppID: util.GetLUint32FromUint64(m.GetGateconnid())}
+			bm.AgentInfo = n.BaseAgentInfo{AgentType: n.NormalUser, AppName: "NormalUser", AppType: util.GetHUint32FromUint64(m.GetGateconnid()), AppId: util.GetLUint32FromUint64(m.GetGateconnid())}
 		} else {
 			bm.AgentInfo = a.info
 			dataReq = a.info
@@ -85,7 +85,7 @@ func (a *agentClient) OnClose() {
 	}
 
 	mxClients.Lock()
-	delete(clients, util.MakeUint64FromUint32(a.info.AppType, a.info.AppID))
+	delete(clients, util.MakeUint64FromUint32(a.info.AppType, a.info.AppId))
 	mxClients.Unlock()
 }
 

@@ -52,7 +52,7 @@ func newServerItem(info n.BaseAgentInfo, autoReconnect bool, pendingWriteNum int
 		}(timerHeartbeat)
 
 		mxServers.Lock()
-		servers[util.MakeUint64FromUint32(info.AppType, info.AppID)] = a
+		servers[util.MakeUint64FromUint32(info.AppType, info.AppId)] = a
 		mxServers.Unlock()
 
 		if info.AppType == n.AppConfig {
@@ -95,13 +95,13 @@ func (a *agentServer) Run() {
 				if conf.AppInfo.Type == m.GetAppType() && conf.AppInfo.Id == m.GetAppId() {
 					//更新center信息
 					if _, ok := servers[util.MakeUint64FromUint32(n.AppCenter, 0)]; ok {
-						servers[util.MakeUint64FromUint32(n.AppCenter, 0)].info.AppID = m.GetCenterId()
+						servers[util.MakeUint64FromUint32(n.AppCenter, 0)].info.AppId = m.GetCenterId()
 					}
 				}
 				mxServers.Unlock()
 
 				if !(conf.AppInfo.Type == m.GetAppType() && conf.AppInfo.Id == m.GetAppId()) && !ok {
-					info := n.BaseAgentInfo{AgentType: n.CommonServer, AppName: m.GetAppName(), AppType: m.GetAppType(), AppID: m.GetAppId(), ListenOnAddr: m.GetAppAddress()}
+					info := n.BaseAgentInfo{AgentType: n.CommonServer, AppName: m.GetAppName(), AppType: m.GetAppType(), AppId: m.GetAppId(), ListenOnAddr: m.GetAppAddress()}
 					newServerItem(info, false, 0)
 				}
 			}
@@ -155,7 +155,7 @@ func (a *agentServer) OnClose() {
 		a.tcpClient.Close()
 
 		mxServers.Lock()
-		delete(servers, util.MakeUint64FromUint32(a.info.AppType, a.info.AppID))
+		delete(servers, util.MakeUint64FromUint32(a.info.AppType, a.info.AppId))
 		mxServers.Unlock()
 	}
 }

@@ -154,9 +154,9 @@ type ConfigReq struct {
 	Key        *string `protobuf:"bytes,2,opt,name=key" json:"key,omitempty"`                                    // 键名 空表示命名空间下的所有键
 	Subscribe  *uint32 `protobuf:"varint,3,opt,name=subscribe" json:"subscribe,omitempty"`                       // 是否订阅配置的更新 见EnumSubscribe
 	AppType    *uint32 `protobuf:"varint,4,opt,name=app_type,json=appType" json:"app_type,omitempty"`            // AppType
-	AppId      *uint32 `protobuf:"varint,5,opt,name=app_id,json=appId" json:"app_id,omitempty"`                  // AppID
+	AppId      *uint32 `protobuf:"varint,5,opt,name=app_id,json=appId" json:"app_id,omitempty"`                  // AppId
 	SubAppType *uint32 `protobuf:"varint,6,opt,name=sub_app_type,json=subAppType" json:"sub_app_type,omitempty"` // AppType
-	SubAppId   *uint32 `protobuf:"varint,7,opt,name=sub_app_id,json=subAppId" json:"sub_app_id,omitempty"`       // AppID
+	SubAppId   *uint32 `protobuf:"varint,7,opt,name=sub_app_id,json=subAppId" json:"sub_app_id,omitempty"`       // AppId
 }
 
 func (x *ConfigReq) Reset() {
@@ -306,7 +306,7 @@ type ConfigRsp struct {
 	RegKey     *string       `protobuf:"bytes,2,opt,name=reg_key,json=regKey" json:"reg_key,omitempty"`                // 订阅的key
 	Item       []*ConfigItem `protobuf:"bytes,3,rep,name=item" json:"item,omitempty"`                                  // 键值
 	SubAppType *uint32       `protobuf:"varint,4,opt,name=sub_app_type,json=subAppType" json:"sub_app_type,omitempty"` // AppType
-	SubAppId   *uint32       `protobuf:"varint,5,opt,name=sub_app_id,json=subAppId" json:"sub_app_id,omitempty"`       // AppID
+	SubAppId   *uint32       `protobuf:"varint,5,opt,name=sub_app_id,json=subAppId" json:"sub_app_id,omitempty"`       // AppId
 }
 
 func (x *ConfigRsp) Reset() {

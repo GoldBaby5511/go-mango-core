@@ -296,8 +296,8 @@ func appControlReq(args []interface{}) {
 	m := (b.MyMessage).(*center.AppControlReq)
 	srcAgent := b.AgentInfo
 
-	log.Debug("", "控制消息,sType=%v,sId=%v,AppType=%v,AppID=%v,CtlId=%v",
-		srcAgent.AppType, srcAgent.AppID, m.GetCtlId(), m.GetAppType(), m.GetAppId())
+	log.Debug("", "控制消息,sType=%v,sId=%v,AppType=%v,AppId=%v,CtlId=%v",
+		srcAgent.AppType, srcAgent.AppId, m.GetCtlId(), m.GetAppType(), m.GetAppId())
 
 	//callback
 	eventCallBack(CbAppControlNotify, args...)
@@ -327,7 +327,7 @@ func ConnectLogServer(logAddr string) {
 		tcpLog.Addr = logAddr
 		tcpLog.AutoReconnect = true
 		tcpLog.NewAgent = func(conn *n.TCPConn) n.AgentServer {
-			a := &agentServer{tcpClient: tcpLog, conn: conn, info: n.BaseAgentInfo{AgentType: n.CommonServer, AppName: "logger", AppType: n.AppLogger, AppID: 0, ListenOnAddr: logAddr}}
+			a := &agentServer{tcpClient: tcpLog, conn: conn, info: n.BaseAgentInfo{AgentType: n.CommonServer, AppName: "logger", AppType: n.AppLogger, AppId: 0, ListenOnAddr: logAddr}}
 			log.Info("gate", "日志服务器连接成功")
 
 			log.SetCallback(func(i log.LogInfo) {
@@ -375,9 +375,9 @@ func eventCallBack(event string, args ...interface{}) {
 
 func SendData(dataSrc n.BaseAgentInfo, bm n.BaseMessage) error {
 	if dataSrc.AgentType == n.CommonServer {
-		return sendData(bm, dataSrc.AppType, dataSrc.AppID)
+		return sendData(bm, dataSrc.AppType, dataSrc.AppId)
 	}
-	return SendMessage2Client(bm, util.MakeUint64FromUint32(dataSrc.AppType, dataSrc.AppID), 0)
+	return SendMessage2Client(bm, util.MakeUint64FromUint32(dataSrc.AppType, dataSrc.AppId), 0)
 }
 
 func SendData2App(destAppType, destAppid, appType, cmdId uint32, m proto.Message) error {
@@ -483,7 +483,7 @@ func GetDestApp(destAppType, destAppid uint32) []*agentServer {
 			}
 		default:
 			for _, v := range servers {
-				if v.info.AppType == destAppType && v.info.AppID == destAppid {
+				if v.info.AppType == destAppType && v.info.AppId == destAppid {
 					destAgent = append(destAgent, v)
 					break
 				}
