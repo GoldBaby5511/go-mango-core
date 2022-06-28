@@ -1,10 +1,10 @@
 package network
 
 import (
-	"github.com/GoldBaby5511/go-mango-core/util/errorhelper"
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"github.com/GoldBaby5511/go-mango-core/util/errorhelper"
 	"io"
 )
 
@@ -13,11 +13,14 @@ const (
 	AppCenter   uint32 = 2
 	AppConfig   uint32 = 3
 	AppGate     uint32 = 4
-	AppLogin    uint32 = 5
+	AppLobby    uint32 = 5
 	AppProperty uint32 = 6
 	AppBattle   uint32 = 7
 	AppLogic    uint32 = 8
 	AppRobot    uint32 = 9
+	AppList     uint32 = 10
+	AppTable    uint32 = 11
+	AppRoom     uint32 = 12
 	AppDaemon   uint32 = 100
 
 	Send2All    uint32 = 1
