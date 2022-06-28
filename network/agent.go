@@ -15,7 +15,7 @@ type (
 		AgentType    uint32
 		AppName      string
 		AppType      uint32
-		AppID        uint32
+		AppId        uint32
 		ListenOnAddr string
 	}
 
