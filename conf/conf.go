@@ -1,24 +1,25 @@
 package conf
 
 import (
-	"github.com/GoldBaby5511/go-mango-core/log"
-	n "github.com/GoldBaby5511/go-mango-core/network"
-	"github.com/GoldBaby5511/go-mango-core/util"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/GoldBaby5511/go-mango-core/log"
+	n "github.com/GoldBaby5511/go-mango-core/network"
+	"github.com/GoldBaby5511/go-mango-core/util"
 	"io/ioutil"
 	"os"
 	"strconv"
 )
 
 const (
-	ArgAppName      string = "-Name"
-	ArgAppType      string = "-Type"
-	ArgAppId        string = "-Id"
-	ArgCenterAddr   string = "-CenterAddr"
-	ArgListenOnAddr string = "-ListenOnAddr"
-	ArgDockerRun    string = "-DockerRun"
+	ArgAppName         string = "-Name"
+	ArgAppType         string = "-Type"
+	ArgAppId           string = "-Id"
+	ArgCenterAddr      string = "-CenterAddr"
+	ArgListenOnAddr    string = "-ListenOnAddr"
+	ArgDockerRun       string = "-DockerRun"
+	ArgDefaultBasePort string = "-DefaultBasePort"
 
 	//服务状态
 	AppStateNone              = 0
@@ -30,11 +31,12 @@ const (
 )
 
 var (
-	LenStackBuf        = 4096
-	GoLen              = 10000
-	TimerDispatcherLen = 10000
-	AsynCallLen        = 10000
-	ChanRPCLen         = 10000
+	LenStackBuf               = 4096
+	GoLen                     = 10000
+	TimerDispatcherLen        = 10000
+	AsynCallLen               = 10000
+	ChanRPCLen                = 10000
+	DefaultBasePort    uint32 = 10000
 	AppInfo            BaseInfo
 	ApplogDir          string
 )
@@ -71,11 +73,14 @@ func LoadBaseConfig(name string) {
 	if v, ok := util.ParseArgsString(ArgListenOnAddr, args); ok {
 		AppInfo.ListenOnAddr = v
 	}
+	if v, ok := util.ParseArgsUint32(ArgDefaultBasePort, args); ok {
+		DefaultBasePort = v
+	}
 	if AppInfo.ListenOnAddr == "" {
-		AppInfo.ListenOnAddr = fmt.Sprintf("0.0.0.0:%d", 10000+AppInfo.Id)
+		AppInfo.ListenOnAddr = fmt.Sprintf("0.0.0.0:%d", DefaultBasePort+AppInfo.Id)
 	}
 	if AppInfo.CenterAddr == "" && AppInfo.Type != n.AppCenter && AppInfo.Type != n.AppLogger {
-		AppInfo.CenterAddr = "127.0.0.1:10050"
+		AppInfo.CenterAddr = fmt.Sprintf("127.0.0.1:%v", DefaultBasePort)
 		log.Debug("", "使用默认地址,CenterAddr=%v", AppInfo.CenterAddr)
 	}
 	if RunInLocalDocker() {
