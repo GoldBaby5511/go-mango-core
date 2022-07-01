@@ -1,10 +1,10 @@
 package console
 
 import (
+	"bufio"
 	"github.com/GoldBaby5511/go-mango-core/conf"
 	"github.com/GoldBaby5511/go-mango-core/log"
 	"github.com/GoldBaby5511/go-mango-core/network"
-	"bufio"
 	"github.com/golang/protobuf/proto"
 	"math"
 	"net"
@@ -20,7 +20,7 @@ func Init() {
 	}
 
 	server = new(network.TCPServer)
-	server.Addr = "localhost:" + strconv.Itoa(int(10000+conf.AppInfo.Id+1))
+	server.Addr = "localhost:" + strconv.Itoa(int(conf.DefaultBasePort+conf.AppInfo.Id+1))
 	server.MaxConnNum = math.MaxInt32
 	server.PendingWriteNum = 100
 	server.NewAgent = newAgent
