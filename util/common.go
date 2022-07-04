@@ -1,12 +1,15 @@
 package util
 
 import (
-	"github.com/google/uuid"
+	"bytes"
+	"math/rand"
 	"net"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func CurMemory() int64 {
@@ -99,4 +102,16 @@ func StrconvAsInt64(str string, defaultValue int64) int64 {
 
 func GetUUID() string {
 	return uuid.New().String()
+}
+
+func RandByte(length int) []byte {
+	var chars = []byte{'.', '/', '?', '%', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
+	buffer := bytes.Buffer{}
+	clength := len(chars)
+	rand.Seed(time.Now().UnixNano()) //重新播种，否则值不会变
+	for i := 0; i < length; i++ {
+		buffer.WriteByte(chars[rand.Intn(clength)])
+
+	}
+	return buffer.Bytes()
 }
