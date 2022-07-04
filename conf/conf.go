@@ -80,7 +80,7 @@ func LoadBaseConfig(name string) {
 		AppInfo.ListenOnAddr = fmt.Sprintf("0.0.0.0:%d", DefaultBasePort+AppInfo.Id)
 	}
 	if AppInfo.CenterAddr == "" && AppInfo.Type != n.AppCenter && AppInfo.Type != n.AppLogger {
-		AppInfo.CenterAddr = fmt.Sprintf("127.0.0.1:%v", DefaultBasePort)
+		AppInfo.CenterAddr = fmt.Sprintf("127.0.0.1:%v", DefaultBasePort+50)
 		log.Debug("", "使用默认地址,CenterAddr=%v", AppInfo.CenterAddr)
 	}
 	if RunInLocalDocker() {
