@@ -13,6 +13,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
+	github.com/streadway/amqp v1.0.0
 	golang.org/x/text v0.3.7
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0

@@ -3,6 +3,7 @@ package gate
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/GoldBaby5511/go-mango-core/amqp"
 	"net/http"
 	"os"
 	"os/signal"
@@ -40,10 +41,11 @@ const (
 	CommonServerReg string = "CommonServerReg"
 
 	//回调
-	CbBeforeServiceStart string = "CbBeforeServiceStart"
-	CbAfterServiceStart  string = "CbAfterServiceStart"
-	CbConfigChangeNotify string = "CbConfigChangeNotify"
-	CbAppControlNotify   string = "CbAppControlNotify"
+	CbBeforeServiceStart    string = "CbBeforeServiceStart"
+	CbAfterServiceStart     string = "CbAfterServiceStart"
+	CbConfigChangeNotify    string = "CbConfigChangeNotify"
+	CbAppControlNotify      string = "CbAppControlNotify"
+	CbRabbitMQMessageNotify string = "CbRabbitMQMessageNotify"
 
 	AgentIndex = 0
 )
@@ -81,6 +83,7 @@ func init() {
 	tcpLog = new(n.TCPClient)
 	Skeleton = module.NewSkeleton(conf.GoLen, conf.TimerDispatcherLen, conf.AsynCallLen, conf.ChanRPCLen)
 	agentChanRPC = Skeleton.ChanRPCServer
+	amqp.MsgRouter = Skeleton.ChanRPCServer
 	closeSig = make(chan bool, 0)
 	MsgRegister(&config.ConfigRsp{}, n.AppConfig, uint16(config.CMDConfig_IDConfigRsp), apollo.HandleConfigRsp)
 	MsgRegister(&config.ItemRspState{}, n.AppConfig, uint16(config.CMDConfig_IDItemRspState), apollo.HandleItemRspState)
@@ -88,6 +91,7 @@ func init() {
 	//s := &serverInfo{}
 	//RpcServiceRegister(s.ServiceRegistrar)
 	apollo.CallBackRegister(configChangeNotify)
+	Skeleton.RegisterChanRPC(amqp.RabbitMqMessageNotifyId, rabbitMQMessageNotify)
 }
 
 func Start(appName string) {
@@ -138,6 +142,7 @@ func Stop() {
 	}
 	closeSig <- true
 	time.Sleep(time.Second / 2)
+	amqp.Close()
 	Skeleton.Close()
 	console.Destroy()
 	wg.Wait()
@@ -284,12 +289,22 @@ func configChangeNotify(args []interface{}) {
 			RpcServer.Port = port
 			RpcServer.Start()
 		}
+	case "rabbitmq消费者":
+		amqp.NewConsumer(value.Value)
 	default:
 		break
 	}
 
 	//callback
 	eventCallBack(CbConfigChangeNotify, args...)
+}
+
+func rabbitMQMessageNotify(args []interface{}) {
+	m := args[0].(amqp.RabbitMQMessage)
+	log.Debug("", "收到了,len=%v,body=%v,time=%v", len(args), m.Body, time.Unix(m.Time, 0).Format("2006-01-02 15-04-05"))
+
+	//callback
+	eventCallBack(CbRabbitMQMessageNotify, args...)
 }
 
 func appControlReq(args []interface{}) {
