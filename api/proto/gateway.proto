@@ -21,8 +21,9 @@ message	PulseReq{
 
 //测速请求
 message	PulseRsp{
-	optional uint32 speed_data=2;
-	optional bytes 	attachd_data=3;
+	optional uint32 speed_data=1;
+	optional bytes 	attachd_data=2;
+	optional int64 	timestamp = 3;
 }
 
 //数据转发请求
@@ -31,7 +32,7 @@ message TransferDataReq{
 	optional uint32 dest_appid=2;     	//目标或源appid
 	optional uint32 data_apptype=3;
 	optional uint32 data_cmdid=4;
-	optional bytes 	data = 5;
+	optional bytes	data = 5;
 	optional uint32 req_id =6;
 	optional uint32 client_ip_v4=7;		//客户端的ip
 	optional uint64 att_sessionid=8; 	//联联的session id ，目前只由gate->client
@@ -67,7 +68,9 @@ message HelloReq{
    optional uint32  game_kind = 5;      
    optional string  client_version=6;
    optional uint32  client_type = 7;
-   optional string  guid = 8;
+   optional string  public_key = 8;
+   optional	string 	encrypt_key = 9;		//加密key
+   optional string  guid = 10;
 }
 
 //握手回复
@@ -79,10 +82,11 @@ message HelloRsp{
       LoginToken=4;        //登录令牌
    }
    
-   optional uint32 rsp_flag= 1;			//通知的消息内容
-   repeated	string gate_address=2;		//当前最新的gate地址
-   optional	bytes encrypt_key = 3;		//加密key
-   optional uint32 login_token=4; 		//登录令牌
+   optional uint32 	rsp_flag= 1;			//通知的消息内容
+   repeated	string 	gate_address=2;		//当前最新的gate地址
+   optional uint32	login_token=4; 		//登录令牌
+   optional string  public_key = 8;
+   optional	string 	encrypt_key = 3;		//加密key
 
    /*
    =0 表示是最新版本
