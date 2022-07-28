@@ -437,7 +437,7 @@ func sendData(bm n.BaseMessage, destAppType, destAppid uint32) error {
 					log.Warning("", "存储丢失消息失败了,err=%v", err)
 				}
 
-				//TEST
+				//TODO 暂时保留
 				//var result []*MissingMessage
 				//q := bson.M{"destAppType": destAppType}
 				//f := c.Find(nil)
@@ -466,7 +466,7 @@ func sendData(bm n.BaseMessage, destAppType, destAppid uint32) error {
 			}
 		}
 
-		log.Warning("转发", "异常,消息发送失败,appCount=%v,destAppType=%v,destAppid=%v,bm.Cmd=%v",
+		log.Warning("转发", "消息发送失败,appCount=%v,destAppType=%v,destAppid=%v,bm.Cmd=%v",
 			destTypeAppCount(destAppType), destAppType, destAppid, bm.Cmd)
 
 		return fmt.Errorf("目标没找到,destAppType=%d,destAppid=%d", destAppType, destAppid)
@@ -498,11 +498,8 @@ func GetDestApp(destAppType, destAppid uint32) []*agentServer {
 				}
 			}
 		default:
-			for _, v := range servers {
-				if v.info.AppType == destAppType && v.info.AppId == destAppid {
-					destAgent = append(destAgent, v)
-					break
-				}
+			if _, ok := servers[util.MakeUint64FromUint32(destAppType, destAppid)]; ok {
+				destAgent = append(destAgent, servers[util.MakeUint64FromUint32(destAppType, destAppid)])
 			}
 		}
 	}

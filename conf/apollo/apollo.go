@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 )
@@ -24,12 +25,12 @@ const (
 )
 
 var (
-	configValues map[ConfKey]*ConfValue = make(map[ConfKey]*ConfValue)
-	regSubList   map[ConfKey]*ConfValue = make(map[ConfKey]*ConfValue)
-	netAgent     n.AgentServer          = nil
+	configValues               = make(map[ConfKey]*ConfValue)
+	regSubList                 = make(map[ConfKey]*ConfValue)
+	netAgent     n.AgentServer = nil
 	mutexConfig  sync.Mutex
-	mxRegSub     sync.Mutex
-	cbFunctions  []func([]interface{}) = make([]func([]interface{}), 0)
+	mutexRegSub  sync.Mutex
+	cbFunctions  = make([]func([]interface{}), 0)
 )
 
 type (
@@ -51,8 +52,10 @@ func SetNetAgent(a n.AgentServer) {
 	}
 	netAgent = a
 	for key, _ := range regSubList {
-		SendSubscribeReq(key, false)
+		sendSubscribeReq(key, false)
 	}
+
+	time.AfterFunc(1*time.Second, checkConfigRsp)
 }
 
 func HandleConfigRsp(args []interface{}) {
@@ -65,14 +68,14 @@ func HandleConfigRsp(args []interface{}) {
 	}
 
 	key := ConfKey{Key: m.GetRegKey(), AppType: m.GetSubAppType(), AppId: m.GetSubAppId()}
-	mxRegSub.Lock()
+	mutexRegSub.Lock()
 	if _, ok := regSubList[key]; !ok {
-		mxRegSub.Unlock()
+		mutexRegSub.Unlock()
 		log.Warning("apollo", "异常，返回的竟然是自己没订阅的,key=%v", key)
 		return
 	}
 	regSubList[key].RspCount += 1
-	mxRegSub.Unlock()
+	mutexRegSub.Unlock()
 
 	for _, v := range m.GetItem() {
 		key.Key = v.GetKey()
@@ -179,6 +182,25 @@ func changeNotify(k ConfKey) {
 	}
 }
 
+func checkConfigRsp() {
+	mutexRegSub.Lock()
+	if len(regSubList) == 0 {
+		mutexRegSub.Unlock()
+		return
+	}
+	totalRspCount := uint64(0)
+	for _, v := range regSubList {
+		totalRspCount += v.RspCount
+	}
+	mutexRegSub.Unlock()
+
+	log.Info("", "配置回复检查,c=%v", totalRspCount)
+
+	if totalRspCount == 0 {
+		time.AfterFunc(1*time.Second, checkConfigRsp)
+	}
+}
+
 func CallBackRegister(cb func([]interface{})) {
 	//重复判断
 	for _, c := range cbFunctions {
@@ -192,26 +214,26 @@ func CallBackRegister(cb func([]interface{})) {
 
 func RegisterConfig(key string, reqAppType, reqAppId uint32) {
 	regKey := ConfKey{Key: key, AppType: reqAppType, AppId: reqAppId}
-	mxRegSub.Lock()
+	mutexRegSub.Lock()
 	if _, ok := regSubList[regKey]; ok {
-		mxRegSub.Unlock()
+		mutexRegSub.Unlock()
 		log.Debug("Apollo", "这个key已经注册过了,key=%v", regKey)
 		return
 	}
 	regSubList[regKey] = &ConfValue{}
-	mxRegSub.Unlock()
+	mutexRegSub.Unlock()
 
 	log.Info("Apollo", "注册Apollo订阅,regKey=%v", regKey)
 
-	SendSubscribeReq(regKey, false)
+	sendSubscribeReq(regKey, false)
 }
 
-func SendSubscribeReq(k ConfKey, cancel bool) {
+func sendSubscribeReq(k ConfKey, cancel bool) {
 	if netAgent == nil {
 		return
 	}
-	mxRegSub.Lock()
-	defer mxRegSub.Unlock()
+	mutexRegSub.Lock()
+	defer mutexRegSub.Unlock()
 	if _, ok := regSubList[k]; !ok {
 		return
 	}

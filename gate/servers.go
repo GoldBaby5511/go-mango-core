@@ -96,7 +96,9 @@ func (a *agentServer) Run() {
 				if conf.AppInfo.Type == m.GetAppType() && conf.AppInfo.Id == m.GetAppId() {
 					//更新center信息
 					if _, ok := servers[util.MakeUint64FromUint32(n.AppCenter, 0)]; ok {
-						servers[util.MakeUint64FromUint32(n.AppCenter, 0)].info.AppId = m.GetCenterId()
+						servers[util.MakeUint64FromUint32(n.AppCenter, m.GetCenterId())] = servers[util.MakeUint64FromUint32(n.AppCenter, 0)]
+						servers[util.MakeUint64FromUint32(n.AppCenter, m.GetCenterId())].info.AppId = m.GetCenterId()
+						delete(servers, util.MakeUint64FromUint32(n.AppCenter, 0))
 					}
 				}
 				mxServers.Unlock()
