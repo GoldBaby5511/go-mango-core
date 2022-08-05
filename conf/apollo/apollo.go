@@ -2,10 +2,10 @@ package apollo
 
 import (
 	"github.com/GoldBaby5511/go-mango-core/api/config"
+	"github.com/GoldBaby5511/go-mango-core/chanrpc"
 	"github.com/GoldBaby5511/go-mango-core/conf"
 	"github.com/GoldBaby5511/go-mango-core/log"
 	n "github.com/GoldBaby5511/go-mango-core/network"
-	"reflect"
 	"strconv"
 	"sync"
 	"time"
@@ -22,6 +22,8 @@ const (
 
 	KeyIndex   = 0
 	ValueIndex = 1
+
+	ConfigChangeNotifyId string = "ConfigChangeNotifyId"
 )
 
 var (
@@ -30,7 +32,7 @@ var (
 	netAgent     n.AgentServer = nil
 	mutexConfig  sync.Mutex
 	mutexRegSub  sync.Mutex
-	cbFunctions  = make([]func([]interface{}), 0)
+	MsgRouter    *chanrpc.Server = nil
 )
 
 type (
@@ -177,9 +179,11 @@ func changeNotify(k ConfKey) {
 		return
 	}
 
-	for _, c := range cbFunctions {
-		c([]interface{}{k, *configValues[k]})
+	if MsgRouter == nil {
+		return
 	}
+
+	MsgRouter.Go(ConfigChangeNotifyId, k, *configValues[k])
 }
 
 func checkConfigRsp() {
@@ -199,17 +203,6 @@ func checkConfigRsp() {
 	if totalRspCount == 0 {
 		time.AfterFunc(1*time.Second, checkConfigRsp)
 	}
-}
-
-func CallBackRegister(cb func([]interface{})) {
-	//重复判断
-	for _, c := range cbFunctions {
-		if reflect.ValueOf(c).Pointer() == reflect.ValueOf(cb).Pointer() {
-			log.Warning("", "已经注册,id=%v", reflect.ValueOf(cb))
-			return
-		}
-	}
-	cbFunctions = append(cbFunctions, cb)
 }
 
 func RegisterConfig(key string, reqAppType, reqAppId uint32) {

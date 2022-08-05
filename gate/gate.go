@@ -83,6 +83,7 @@ func init() {
 	tcpLog = new(n.TCPClient)
 	Skeleton = module.NewSkeleton(conf.GoLen, conf.TimerDispatcherLen, conf.AsynCallLen, conf.ChanRPCLen)
 	agentChanRPC = Skeleton.ChanRPCServer
+	apollo.MsgRouter = Skeleton.ChanRPCServer
 	amqp.MsgRouter = Skeleton.ChanRPCServer
 	closeSig = make(chan bool, 0)
 	MsgRegister(&config.ConfigRsp{}, n.AppConfig, uint16(config.CMDConfig_IDConfigRsp), apollo.HandleConfigRsp)
@@ -90,7 +91,7 @@ func init() {
 	MsgRegister(&center.AppControlReq{}, n.AppCenter, uint16(center.CMDCenter_IDAppControlReq), appControlReq)
 	//s := &serverInfo{}
 	//RpcServiceRegister(s.ServiceRegistrar)
-	apollo.CallBackRegister(configChangeNotify)
+	Skeleton.RegisterChanRPC(apollo.ConfigChangeNotifyId, configChangeNotify)
 	Skeleton.RegisterChanRPC(amqp.RabbitMqMessageNotifyId, rabbitMQMessageNotify)
 }
 
