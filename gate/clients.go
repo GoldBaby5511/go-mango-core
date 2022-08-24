@@ -66,12 +66,12 @@ func (a *agentClient) Run() {
 
 		cmd, msg, err = processor.Unmarshal(unmarshalCmd.AppType, unmarshalCmd.CmdId, msgData)
 		if err != nil {
-			log.Error("agentClient", "异常,agentClient反序列化,headCmd=%v,error: %v", bm.Cmd, err)
+			log.Warning("agentClient", "异常,agentClient反序列化,headCmd=%v,error: %v", bm.Cmd, err)
 			continue
 		}
 		err = processor.Route(n.BaseMessage{MyMessage: msg, AgentInfo: bm.AgentInfo, TraceId: bm.TraceId}, a, cmd, dataReq)
 		if err != nil {
-			log.Error("agentClient", "client agentClient route message error: %v,cmd=%v", err, cmd)
+			log.Warning("agentClient", "client agentClient route message error: %v,cmd=%v", err, cmd)
 			continue
 		}
 	}
