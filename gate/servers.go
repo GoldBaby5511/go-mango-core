@@ -176,9 +176,16 @@ func (a *agentServer) SendMessage(bm n.BaseMessage) {
 		otherData = append(otherData, n.FlagOtherTraceId)
 		otherData = append(otherData, []byte(bm.TraceId)...)
 	}
+
+	//超长判断
+	if (len(data) + len(otherData)) > int(MaxMsgLen-1024) {
+		log.Error("agentServer", "异常,消息体超长,type=%v,cmd=%v", reflect.TypeOf(m), bm.Cmd)
+		return
+	}
+
 	err = a.conn.WriteMsg(bm.Cmd.AppType, bm.Cmd.CmdId, data, otherData)
 	if err != nil {
-		log.Error("agentServer", "写信息失败 %v error: %v", reflect.TypeOf(m), err)
+		log.Error("agentServer", "写信息失败,type=%v,cmd=%v,err=%v", reflect.TypeOf(m), bm.Cmd, err)
 	}
 }
 
@@ -188,6 +195,13 @@ func (a *agentServer) SendData(appType, cmdId uint32, m proto.Message) {
 		log.Error("agentServer", "异常,proto.Marshal %v error: %v", reflect.TypeOf(m), err)
 		return
 	}
+
+	//超长判断
+	if len(data) > int(MaxMsgLen-1024) {
+		log.Error("agentServer", "异常,消息体超长,type=%v,appType=%v,cmdId=%v", reflect.TypeOf(m), appType, cmdId)
+		return
+	}
+
 	err = a.conn.WriteMsg(uint16(appType), uint16(cmdId), data, nil)
 	if err != nil {
 		log.Error("agentServer", "write message %v error: %v", reflect.TypeOf(m), err)

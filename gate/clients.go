@@ -23,8 +23,14 @@ func (a *agentClient) Run() {
 	for {
 		bm, msgData, err := a.conn.ReadMsg()
 		if err != nil {
-			log.Warning("agentClient", "异常,网关读取消息失败,info=%v,err=%v", a.info, err)
-			break
+			//服务间连接
+			if a.info.AppType == n.CommonServer {
+				log.Error("agentClient", "异常,网关读取消息失败,info=%v,err=%v", a.info, err)
+				continue
+			} else {
+				log.Warning("agentClient", "异常,网关读取消息失败,info=%v,err=%v", a.info, err)
+				break
+			}
 		}
 		if processor == nil {
 			log.Error("agentClient", "异常,解析器为nil断开连接,cmd=%v", &bm.Cmd)
@@ -112,6 +118,13 @@ func (a *agentClient) SendData(appType, cmdId uint32, m proto.Message) {
 		log.Error("agentClient", "异常,proto.Marshal %v error: %v", reflect.TypeOf(m), err)
 		return
 	}
+
+	//超长判断
+	if len(data) > int(MaxMsgLen-1024) {
+		log.Error("agentClient", "异常,消息体超长,type=%v,appType=%v,cmdId=%v", reflect.TypeOf(m), appType, cmdId)
+		return
+	}
+
 	err = a.conn.WriteMsg(uint16(appType), uint16(cmdId), data, nil)
 	if err != nil {
 		log.Error("agentClient", "write message %v error: %v", reflect.TypeOf(m), err)
