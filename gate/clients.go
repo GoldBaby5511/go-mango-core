@@ -121,7 +121,7 @@ func (a *agentClient) SendData(appType, cmdId uint32, m proto.Message) {
 
 	//超长判断
 	if len(data) > int(MaxMsgLen-1024) {
-		log.Error("agentClient", "异常,消息体超长,type=%v,appType=%v,cmdId=%v", reflect.TypeOf(m), appType, cmdId)
+		log.Error("agentClient", "异常,消息体超长,type=%v,appType=%v,cmdId=%v,len=%v,max=%v", reflect.TypeOf(m), appType, cmdId, len(data), int(MaxMsgLen-1024))
 		return
 	}
 

@@ -179,7 +179,7 @@ func (a *agentServer) SendMessage(bm n.BaseMessage) {
 
 	//超长判断
 	if (len(data) + len(otherData)) > int(MaxMsgLen-1024) {
-		log.Error("agentServer", "异常,消息体超长,type=%v,cmd=%v", reflect.TypeOf(m), bm.Cmd)
+		log.Error("agentServer", "异常,消息体超长,type=%v,cmd=%v,len=%v,max=%v", reflect.TypeOf(m), bm.Cmd, len(data)+len(otherData), int(MaxMsgLen-1024))
 		return
 	}
 
@@ -198,7 +198,7 @@ func (a *agentServer) SendData(appType, cmdId uint32, m proto.Message) {
 
 	//超长判断
 	if len(data) > int(MaxMsgLen-1024) {
-		log.Error("agentServer", "异常,消息体超长,type=%v,appType=%v,cmdId=%v", reflect.TypeOf(m), appType, cmdId)
+		log.Error("agentServer", "异常,消息体超长,type=%v,appType=%v,cmdId=%v,len=%v,max=%v", reflect.TypeOf(m), appType, cmdId, len(data), int(MaxMsgLen-1024))
 		return
 	}
 
