@@ -24,11 +24,14 @@ var (
 )
 
 func NewConsumer(c string) {
+	if c == "" {
+		return
+	}
 	var err error
 	var jsonConfig *simplejson.Json
 	jsonConfig, err = simplejson.NewJson([]byte(c))
 	if err != nil {
-		log.Warning("database", "数据库配置异常,dbConfig=%v,err=%v", c, err)
+		log.Warning("database", "RabbitMq配置异常,MqConfig=%v,err=%v", c, err)
 		return
 	}
 	url := jsonConfig.Get("url").MustString("")
